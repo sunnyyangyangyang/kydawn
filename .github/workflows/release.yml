@@ -28,9 +28,9 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        cpu: [ x64, x86 ]
+        cpu: [ x64 ]
         kind: [ zip ]
-        trimmed: [ true, false ]
+        trimmed: [ false ]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
