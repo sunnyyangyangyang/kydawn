@@ -1,0 +1,62 @@
+name: CI Checks
+
+on:
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: build (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '6.0.x'
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build -c Release --no-restore
+
+      - name: Verify build output
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f DownKyi/bin/Release/net6.0/DownKyi.dll
+          # DownKyi.Core sets a default RuntimeIdentifier per build OS, so its
+          # output lands in net6.0/<rid>/ - be RID-agnostic when verifying.
+          find DownKyi.Core/bin/Release -name DownKyi.Core.dll | grep -q .
+          echo "Build artifacts verified."
+
+  ci-gate:
+    # Overall gate: a single check context that turns green only when ALL
+    # build matrix jobs succeeded. Branch protection on main requires this
+    # one context, so the merge decision reduces to one purposeful signal:
+    # the app compiled cleanly on every OS it targets.
+    name: ci-gate
+    needs: [ build ]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Verify all build variants passed
+        shell: bash
+        run: |
+          set -euo pipefail
+          result="${{ needs.build.result }}"
+          echo "build aggregate result: ${result}"
+          if [ "${result}" != "success" ]; then
+            echo "::error::ci-gate: not all build jobs succeeded (result: ${result})"
+            exit 1
+          fi
+          echo "All build variants succeeded; overall gate GREEN."
