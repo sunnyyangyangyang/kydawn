@@ -1,6 +1,9 @@
-﻿using Avalonia.Media.Imaging;
+using System.Net;
+using Avalonia.Media.Imaging;
 using DownKyi.Core.BiliApi.Login.Models;
 using DownKyi.Core.Logging;
+using DownKyi.Core.Settings;
+using DownKyi.Core.Storage;
 using DownKyi.Core.Utils;
 using Newtonsoft.Json;
 using Console = DownKyi.Core.Utils.Debugging.Console;
@@ -38,11 +41,32 @@ public static class LoginQr
     {
         var url = $"https://passport.bilibili.com/x/passport-login/web/qrcode/poll?qrcode_key={qrcodeKey}";
 
-        var response = WebClient.RequestWeb(url);
-
         try
         {
-            return JsonConvert.DeserializeObject<LoginStatus>(response);
+            var cookieContainer = new CookieContainer();
+            using var handler = new HttpClientHandler
+            {
+                AllowAutoRedirect = false,
+                AutomaticDecompression = DecompressionMethods.All,
+                CookieContainer = cookieContainer,
+                UseCookies = true
+            };
+            using var httpClient = new HttpClient(handler);
+            httpClient.DefaultRequestHeaders.Add("User-Agent", SettingsManager.GetInstance().GetUserAgent());
+            httpClient.DefaultRequestHeaders.Add("accept-language", "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7");
+            httpClient.DefaultRequestHeaders.Add("origin", "https://www.bilibili.com");
+
+            using var response = httpClient.GetAsync(url).GetAwaiter().GetResult();
+            response.EnsureSuccessStatusCode();
+
+            var json = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+            var loginStatus = JsonConvert.DeserializeObject<LoginStatus>(json);
+            if (loginStatus?.Data != null)
+            {
+                loginStatus.Data.Cookies = ExtractCookies(cookieContainer);
+            }
+
+            return loginStatus;
         }
         catch (Exception e)
         {
@@ -83,5 +107,38 @@ public static class LoginQr
         var qrCode = QrCode.EncodeQrCode(url, 11, 10, null, 0, 0, false);
 
         return qrCode;
+    }
+
+    private static List<DownKyiCookie> ExtractCookies(CookieContainer cookieContainer)
+    {
+        var result = new List<DownKyiCookie>();
+        var uris = new[]
+        {
+            new Uri("https://passport.bilibili.com"),
+            new Uri("https://www.bilibili.com"),
+            new Uri("https://api.bilibili.com"),
+            new Uri("https://account.bilibili.com")
+        };
+
+        foreach (var uri in uris)
+        {
+            foreach (Cookie cookie in cookieContainer.GetCookies(uri))
+            {
+                if (string.IsNullOrWhiteSpace(cookie.Name) || string.IsNullOrWhiteSpace(cookie.Value))
+                {
+                    continue;
+                }
+
+                result.Add(new DownKyiCookie(
+                    cookie.Name,
+                    cookie.Value,
+                    string.IsNullOrWhiteSpace(cookie.Domain) ? ".bilibili.com" : cookie.Domain));
+            }
+        }
+
+        return result
+            .GroupBy(c => c.Name, StringComparer.OrdinalIgnoreCase)
+            .Select(g => g.Last())
+            .ToList();
     }
 }
