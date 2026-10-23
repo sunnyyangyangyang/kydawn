@@ -34,7 +34,9 @@ jobs:
         run: |
           set -euo pipefail
           test -f DownKyi/bin/Release/net6.0/DownKyi.dll
-          test -f DownKyi.Core/bin/Release/net6.0/DownKyi.Core.dll
+          # DownKyi.Core sets a default RuntimeIdentifier per build OS, so its
+          # output lands in net6.0/<rid>/ - be RID-agnostic when verifying.
+          find DownKyi.Core/bin/Release -name DownKyi.Core.dll | grep -q .
           echo "Build artifacts verified."
 
   ci-gate:
