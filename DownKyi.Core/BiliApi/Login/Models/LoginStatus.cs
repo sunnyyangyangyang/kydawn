@@ -1,4 +1,5 @@
-﻿using DownKyi.Core.BiliApi.Models;
+using DownKyi.Core.BiliApi.Models;
+using DownKyi.Core.Storage;
 using Newtonsoft.Json;
 
 namespace DownKyi.Core.BiliApi.Login.Models
@@ -19,5 +20,6 @@ namespace DownKyi.Core.BiliApi.Login.Models
         [JsonProperty("refresh_token")] public string RefreshToken { get; set; }
         [JsonProperty("code")] public int Code { get; set; }
         [JsonProperty("message")] public string Message { get; set; }
+        [JsonIgnore] public List<DownKyiCookie>? Cookies { get; set; }
     }
 }
