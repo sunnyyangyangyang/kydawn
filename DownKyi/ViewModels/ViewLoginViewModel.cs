@@ -19,7 +19,7 @@ public class ViewLoginViewModel : ViewModelBase
 
     private CancellationTokenSource? _tokenSource;
 
-    #region 页面属性声明
+    #region 页面属性申明
 
     private Bitmap? _loginQrCode;
 
@@ -160,9 +160,7 @@ public class ViewLoginViewModel : ViewModelBase
                     // 保存登录信息
                     try
                     {
-                        var isSucceed = loginStatus.Data.Cookies is { Count: > 0 }
-                            ? LoginHelper.SaveLoginInfoCookies(loginStatus.Data.Cookies)
-                            : LoginHelper.SaveLoginInfoCookies(loginStatus.Data.Url);
+                        var isSucceed = LoginHelper.SaveLoginInfoCookies(loginStatus.Data.Url);
                         if (!isSucceed)
                         {
                             EventAggregator.GetEvent<MessageEvent>().Publish(DictionaryResource.GetString("LoginFailed"));
@@ -189,6 +187,7 @@ public class ViewLoginViewModel : ViewModelBase
             break;
         }
     }
+
 
     /// <summary>
     /// 初始化状态
