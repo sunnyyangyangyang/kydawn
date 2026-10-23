@@ -2,18 +2,18 @@
 
 <div align="center">
 
-[![GitHub Repo stars](https://img.shields.io/github/stars/yaobiao131/downkyicore)](https://github.com/yaobiao131/downkyicore/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/yaobiao131/downkyicore)](https://github.com/yaobiao131/downkyicore/network)
-[![GitHub issues](https://img.shields.io/github/issues/yaobiao131/downkyicore)](https://github.com/yaobiao131/downkyicore/issues)
-[![LICENSE](https://img.shields.io/github/license/yaobiao131/downkyicore)](https://github.com/yaobiao131/downkyicore/blob/main/LICENSE)
+[![GitHub Repo stars](https://img.shields.io/github/stars/sunnyyangyangyang/kydawn)](https://github.com/sunnyyangyangyang/kydawn/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/sunnyyangyangyang/kydawn)](https://github.com/sunnyyangyangyang/kydawn/network)
+[![GitHub issues](https://img.shields.io/github/issues/sunnyyangyangyang/kydawn)](https://github.com/sunnyyangyangyang/kydawn/issues)
+[![LICENSE](https://img.shields.io/github/license/sunnyyangyangyang/kydawn)](https://github.com/sunnyyangyangyang/kydawn/blob/main/LICENSE)
 
 </div>
 
 ## 下载
 
-[![GitHub release (latest by date)](https://img.shields.io/github/v/release/yaobiao131/downkyicore)](https://github.com/yaobiao131/downkyicore/releases/latest)
-[![GitHub Release Date](https://img.shields.io/github/release-date/yaobiao131/downkyicore)](https://github.com/yaobiao131/downkyicore/releases/latest)
-[![GitHub all releases](https://img.shields.io/github/downloads/yaobiao131/downkyicore/total)](https://github.com/yaobiao131/downkyicore/releases/latest)
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/sunnyyangyangyang/kydawn)](https://github.com/sunnyyangyangyang/kydawn/releases/latest)
+[![GitHub Release Date](https://img.shields.io/github/release-date/sunnyyangyangyang/kydawn)](https://github.com/sunnyyangyangyang/kydawn/releases/latest)
+[![GitHub all releases](https://img.shields.io/github/downloads/sunnyyangyangyang/kydawn/total)](https://github.com/sunnyyangyangyang/kydawn/releases/latest)
 
 [更新日志](CHANGELOG.md)
 
@@ -28,12 +28,6 @@
   - Windows: 软件运行目录下的Media文件夹
   - macOS: ~/Library/Application Support/DownKyi/Media
   - linux: ~/.config/DownKyi/Media
-
-## 赞助
-
-如果这个项目对您有很大帮助，并且您希望支持该项目的开发和维护，请随时扫描一下二维码进行捐赠。非常感谢您的捐款，谢谢！
-
-![Alipay.png](https://s3.bzdrs.cn/downkyi/img/AliPay.png)![WeChat.png](https://s3.bzdrs.cn/downkyi/img/WechatPay.jpg)
 
 ## 免责申明
 1. 本软件只提供视频解析，不提供任何资源上传、存储到服务器的功能。
