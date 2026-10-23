@@ -219,12 +219,44 @@ jobs:
           name: DownKyi-${{ steps.version.outputs.content }}-osx-${{ matrix.cpu }}.dmg
           path: script/macos/DownKyi-${{ steps.version.outputs.content }}-osx-${{ matrix.cpu }}.dmg
 
+  release-gate:
+    # A release is published only when the push to main is a merge commit
+    # AND version.txt was bumped relative to the pre-merge state. Direct
+    # pushes, and merges without a version bump, still build (canary) but
+    # do not publish.
+    runs-on: ubuntu-latest
+    outputs:
+      should-release: ${{ steps.check.outputs.should }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - id: check
+        shell: bash
+        run: |
+          set -euo pipefail
+          parents=$(git cat-file -p HEAD | grep -c '^parent ' || true)
+          is_merge=false
+          if [ "${parents:-0}" -ge 2 ]; then is_merge=true; fi
+          bump=false
+          if [ "$is_merge" = "true" ] && ! git diff --quiet HEAD^1 HEAD -- version.txt; then
+            bump=true
+          fi
+          if [ "$is_merge" = "true" ] && [ "$bump" = "true" ]; then
+            echo "should=true" >> "$GITHUB_OUTPUT"
+            echo "merge with version.txt bump - release will be published"
+          else
+            echo "should=false" >> "$GITHUB_OUTPUT"
+            echo "is_merge=$is_merge version_bump=$bump - no release (merge + version bump required)"
+          fi
+
   release:
     # Central release point: publishes one release per version.txt, updated
     # in place on every subsequent merge (allowUpdates). Bump version.txt to
-    # open a new release.
-    needs: [ build-windows, build-linux, build-macos ]
-    if: always()
+    # open a new release. Only merge commits with a version.txt bump reach
+    # this job (see release-gate).
+    needs: [ build-windows, build-linux, build-macos, release-gate ]
+    if: always() && needs.release-gate.outputs.should-release == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
